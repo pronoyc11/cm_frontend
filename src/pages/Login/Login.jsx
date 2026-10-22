@@ -6,6 +6,7 @@ import { Mail, Lock, Eye, EyeOff, LogIn, Sparkles, ShieldCheck, UserCheck } from
 
 export default function Login() {
     const navigate = useNavigate();
+    const isDevToolsEnabled = false;
 
     const [form, setForm] = useState({ email: "", password: "" });
     const [showPassword, setShowPassword] = useState(false);
@@ -82,7 +83,7 @@ export default function Login() {
                             </button>
                         </div>
 
-                        {/* Dev Route Inspector Bypass */}
+                        {isDevToolsEnabled && (
                         <div className="pt-2 border-t border-base-300/80">
                             <p className="text-[11px] font-semibold text-base-content/70 mb-1.5 flex items-center justify-between">
                                 <span>🔓 Direct Login & Inspect Routes (Dev Bypass):</span>
@@ -118,6 +119,7 @@ export default function Login() {
                                 </button>
                             </div>
                         </div>
+                        )}
                     </div>
 
                     {error && (

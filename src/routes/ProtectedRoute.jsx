@@ -4,29 +4,31 @@ import { getToken } from "../utils/auth";
 import { getMe } from "../services/auth.api";
 
 export default function ProtectedRoute({ children }) {
-  const [isValid, setIsValid] = useState(null);
   const token = getToken();
+  const getInitialState = () => {
+    if (!token) return false;
+    return null; // Needs async verification
+  };
+  const [isValid, setIsValid] = useState(getInitialState());
 
   useEffect(() => {
-    // Check if dev bypass is enabled for testing/grading protected routes
-    const isBypass = localStorage.getItem("dev_bypass") === "true" || window.location.search.includes("bypass=true");
-    if (isBypass) {
-      setIsValid(true);
-      return;
-    }
 
-    if (!token) {
-      setIsValid(false);
-      return;
-    }
+    if (!token) return;
 
+    let isCancelled = false;
     // Verify token is valid
-    getMe()
-      .then(() => setIsValid(true))
+   getMe()
+      .then(() => {
+        if (!isCancelled) setIsValid(true);
+      })
       .catch(() => {
-        // Fallback: if token exists but network/server check fails, still allow if token exists
-        setIsValid(!!token);
+        if (!isCancelled) setIsValid(false);
       });
+
+    // 3. Cleanup to prevent state updates on unmounted components
+    return () => {
+      isCancelled = true;
+    };
   }, [token]);
 
   if (isValid === null) {
